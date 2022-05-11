@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
+
 	"github.com/gocolly/colly"
 )
 
@@ -13,11 +15,14 @@ type Movie struct {
 	Link  string
 }
 
-func fetchWatchlist(username string) [][]string {
+func fetchWatchlist(link string) [][]string {
 	var movies [][]string
 	c := colly.NewCollector(
 		colly.AllowedDomains("letterboxd.com"),
+		colly.Async(true),
 	)
+
+	c.Limit(&colly.LimitRule{DomainGlob: "*", Parallelism: 4})
 
 	c.OnRequest(func(r *colly.Request) {
 		fmt.Println("Visiting: ", r.URL.String())
@@ -28,32 +33,34 @@ func fetchWatchlist(username string) [][]string {
 		c.Visit(e.Request.AbsoluteURL(nextPage))
 	})
 
-	// Find all movies in watchlist
+	// Find all movies in list
 	c.OnHTML(".poster-list li", func(e *colly.HTMLElement) {
 		film := e.ChildAttr("div", "data-target-link")
 
 		movie := Movie{}
-		movie.Title = film[6 : len(film)-1]
+		movie.Title = strings.Replace(film[6:len(film)-1], "-", " ", -1)
 		movie.Link = "https://letterboxd.com" + film
 
 		row := []string{movie.Title, movie.Link}
 		movies = append(movies, row)
 	})
 
-	c.Visit(fmt.Sprintf("https://letterboxd.com/%s/watchlist/page/1/", username))
+	c.Visit(link)
 
+	c.Wait()
 	return movies
 }
 
-func writeWatchlist(username string, movies [][]string) {
-	file, err := os.Create(fmt.Sprintf("watchlist-%s.csv", username))
+func writeWatchlist(link string, movies [][]string) {
+	link = strings.Replace(link, "https://letterboxd.com/", "", 1)
+	file, err := os.Create(fmt.Sprintf("%s.csv", strings.Replace(link, "/", ":", -1)))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
-	headers := []string{"Title", "Link"}
+	headers := []string{"Title", "LetterboxdURI"}
 	writer.Write(headers)
 
 	for _, movie := range movies {
@@ -63,11 +70,12 @@ func writeWatchlist(username string, movies [][]string) {
 
 func main() {
 	if len(os.Args) == 1 {
-		fmt.Println("Username required")
+		fmt.Println("link to letterboxd watchlist or other public list required")
 		os.Exit(1)
 	}
-	username := os.Args[1]
 
-	movies := fetchWatchlist(username)
-	writeWatchlist(username, movies)
+	link := os.Args[1]
+	movies := fetchWatchlist(link)
+	writeWatchlist(link, movies)
+
 }

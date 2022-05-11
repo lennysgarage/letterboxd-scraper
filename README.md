@@ -1,9 +1,8 @@
 # letterboxd-scraper
 
-Download watchlist info of a given letterboxd user
+Download watchlist or public list of a given letterboxd user
 
 ## Usage
-----------------
 - Clone repo
     ```
     git clone https://github.com/lennysgarage/letterboxd-scraper.git
@@ -16,5 +15,9 @@ Download watchlist info of a given letterboxd user
 - Run
     ```
     go build
-    ./letterboxd-scraper <username>
+    ./letterboxd-scraper <list-link>
     ```
+
+## Example
+    ./letterboxd-scraper https://letterboxd.com/lennysgarage/watchlist/
+    ./letterboxd-scraper https://letterboxd.com/lennysgarage/list/movies-from-high-school/
