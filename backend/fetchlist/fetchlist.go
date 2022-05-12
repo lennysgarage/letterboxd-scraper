@@ -1,10 +1,7 @@
-package main
+package fetchlist
 
 import (
-	"encoding/csv"
 	"fmt"
-	"log"
-	"os"
 	"strings"
 
 	"github.com/gocolly/colly"
@@ -15,7 +12,7 @@ type Movie struct {
 	Link  string
 }
 
-func fetchWatchlist(link string) [][]string {
+func FetchWatchlist(link string) [][]string {
 	var movies [][]string
 	c := colly.NewCollector(
 		colly.AllowedDomains("letterboxd.com"),
@@ -49,33 +46,4 @@ func fetchWatchlist(link string) [][]string {
 
 	c.Wait()
 	return movies
-}
-
-func writeWatchlist(link string, movies [][]string) {
-	link = strings.Replace(link, "https://letterboxd.com/", "", 1)
-	file, err := os.Create(fmt.Sprintf("%s.csv", strings.Replace(link, "/", ":", -1)))
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
-	headers := []string{"Title", "LetterboxdURI"}
-	writer.Write(headers)
-
-	for _, movie := range movies {
-		writer.Write(movie)
-	}
-}
-
-func main() {
-	if len(os.Args) == 1 {
-		fmt.Println("link to letterboxd watchlist or other public list required")
-		os.Exit(1)
-	}
-
-	link := os.Args[1]
-	movies := fetchWatchlist(link)
-	writeWatchlist(link, movies)
-
 }

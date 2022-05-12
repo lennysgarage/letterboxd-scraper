@@ -1,6 +1,6 @@
 # letterboxd-scraper
 
-Download watchlist or public list of a given letterboxd user
+Download a csv file of a letterboxd watchlist or public list 
 
 ## Usage
 - Clone repo
@@ -9,13 +9,19 @@ Download watchlist or public list of a given letterboxd user
     ```
 - Get packages
     ```
-    cd letterboxd-scraper
+    cd letterboxd-scraper/backend
     go get
     ```
-- Run
+- Run command line tool
     ```
     go build
     ./letterboxd-scraper <list-link>
+    ```
+- Run server tool
+    ```
+    cd letterboxd-scraper/backend/server
+    go build
+    ./server
     ```
 
 ## Example
