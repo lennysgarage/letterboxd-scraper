@@ -5,12 +5,12 @@ hideLoading();
 function sendRequest() {
     return async function(e) {
         e.preventDefault();
-        let link = document.getElementById('username').value;
+        let link = document.getElementById('link').value;
         if (link !== '') {
             showLoading();
-            // development: http://localhost:8080/api?username=${username}
-            // production: https://letterboxd-picker-api.herokuapp.com/api?username=${username}
-            const response = await fetch(`http://localhost:8080/api?src=${link}`);
+            // development: http://localhost:8080/api?src=${link}
+            // production: https://letterboxd-scraper.herokuapp.com/api?src=${link}
+            const response = await fetch(`https://letterboxd-scraper.herokuapp.com/api?src=${link}`);
             hideLoading();
             let movie = document.getElementById("movie-container");
             if (response.status === 200) {
