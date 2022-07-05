@@ -6,7 +6,8 @@ import (
 	"log"
 	"os"
 	"strings"
-	
+	"sync"
+
 	fetchlist "github.com/lennysgarage/letterboxd-scraper/fetchlist"
 )
 
@@ -33,8 +34,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	link := os.Args[1]
-	movies := fetchlist.FetchWatchlist(link)
-	writeList(link, movies)
+	var wg sync.WaitGroup
 
+	for _, link := range os.Args[1:] {
+		wg.Add(1)
+
+		go func(link string) {
+			defer wg.Done()
+			movies := fetchlist.FetchWatchlist(link)
+			writeList(link, movies)
+		}(link)
+	}
+	wg.Wait()
 }
