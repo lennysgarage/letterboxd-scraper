@@ -15,7 +15,7 @@ Download a csv file of a letterboxd watchlist or public list
 - Run command line tool
     ```
     go build
-    ./letterboxd-scraper <list-link>
+    ./letterboxd-scraper <list-link> <link-link-2> ...
     ```
 - Run server tool
     ```
