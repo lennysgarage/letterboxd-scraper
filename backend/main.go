@@ -11,7 +11,7 @@ import (
 	fetchlist "github.com/lennysgarage/letterboxd-scraper/fetchlist"
 )
 
-func writeList(link string, movies [][]string) {
+func writeList(link string, movies []fetchlist.Movie) {
 	link = strings.Replace(link, "https://letterboxd.com/", "", 1) // remove url in name of file
 	file, err := os.Create(fmt.Sprintf("%s.csv", strings.Replace(link, "/", ":", -1)))
 	if err != nil {
@@ -24,7 +24,7 @@ func writeList(link string, movies [][]string) {
 	writer.Write(headers)
 
 	for _, movie := range movies {
-		writer.Write(movie)
+		writer.Write([]string{movie.Title, movie.Link})
 	}
 }
 
