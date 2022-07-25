@@ -12,8 +12,9 @@ type Movie struct {
 	Link  string
 }
 
-func FetchWatchlist(link string) [][]string {
-	var movies [][]string
+func FetchWatchlist(link string) []Movie {
+	var movies []Movie
+	// var movies [][]string
 	c := colly.NewCollector(
 		colly.AllowedDomains("letterboxd.com"),
 		colly.Async(true),
@@ -38,8 +39,8 @@ func FetchWatchlist(link string) [][]string {
 		movie.Title = strings.Replace(film[6:len(film)-1], "-", " ", -1)
 		movie.Link = "https://letterboxd.com" + film
 
-		row := []string{movie.Title, movie.Link}
-		movies = append(movies, row)
+		// row := []string{movie.Title, movie.Link}
+		movies = append(movies, movie)
 	})
 
 	c.Visit(link)
