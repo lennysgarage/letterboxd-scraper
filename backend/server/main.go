@@ -74,7 +74,7 @@ func main() {
 		if len(links) > 1 && intersection == "true" {
 			// Create intersected watchlist
 			movieList = intersectWatchlists(movieList, len(links))
-		} else { //union		
+		} else { // Union		
 			movieList = unionWatchlists(movieList)
 		}
 

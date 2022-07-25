@@ -3,6 +3,7 @@ package fetchlist
 import (
 	"fmt"
 	"strings"
+	"log"
 
 	"github.com/gocolly/colly"
 )
@@ -14,13 +15,15 @@ type Movie struct {
 
 func FetchWatchlist(link string) []Movie {
 	var movies []Movie
-	// var movies [][]string
 	c := colly.NewCollector(
 		colly.AllowedDomains("letterboxd.com"),
 		colly.Async(true),
 	)
 
-	c.Limit(&colly.LimitRule{DomainGlob: "*", Parallelism: 4})
+	err := c.Limit(&colly.LimitRule{DomainGlob: "*", Parallelism: 4})
+	if err != nil {
+		log.Println("Failed to setup colly limit ", err)
+	}
 
 	c.OnRequest(func(r *colly.Request) {
 		fmt.Println("Visiting: ", r.URL.String())
@@ -28,7 +31,10 @@ func FetchWatchlist(link string) []Movie {
 
 	c.OnHTML(".pagination", func(e *colly.HTMLElement) {
 		nextPage := e.ChildAttr(".paginate-nextprev a.next", "href")
-		c.Visit(e.Request.AbsoluteURL(nextPage))
+		err = c.Visit(e.Request.AbsoluteURL(nextPage))
+		if err != nil {
+			log.Println("Failed to visit absoluteURL", err)
+		}
 	})
 
 	// Find all movies in list
@@ -39,11 +45,13 @@ func FetchWatchlist(link string) []Movie {
 		movie.Title = strings.Replace(film[6:len(film)-1], "-", " ", -1)
 		movie.Link = "https://letterboxd.com" + film
 
-		// row := []string{movie.Title, movie.Link}
 		movies = append(movies, movie)
 	})
 
-	c.Visit(link)
+	err = c.Visit(link)
+	if err != nil {
+		log.Println("Failed to visit webpage", err)
+	}
 
 	c.Wait()
 	return movies
