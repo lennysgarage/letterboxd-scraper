@@ -5,13 +5,14 @@ hideLoading();
 function sendRequest() {
     return async function (e) {
         e.preventDefault();
-        let links = document.getElementById('link').value.split(" ");
-        if (links.length !== 0) {
+        let links = document.getElementById('link').value.trim().split(" ");
+        if (links.length > 0 && links[0] !== '') {
             showLoading();
             // development:
             // let urlString = "http://localhost:8080/api?";
             // production:
             let urlString = "https://letterboxd-scraper.herokuapp.com/api?";
+
             links.forEach((link) => {
                 urlString += "src=" + link + "&";
             })
@@ -19,11 +20,14 @@ function sendRequest() {
                 urlString += "i=true";
             }
 
+            console.log("url: " + urlString)
             const response = await fetch(urlString);
             hideLoading();
 
             let movie = document.getElementById("movie-container");
             if (response.status === 200) {
+                movie.innerHTML = ``;
+
                 const arr = await response.json();
                 arr.unshift(["Title", "LetterboxdURI"])
 
