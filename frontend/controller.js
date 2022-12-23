@@ -1,12 +1,13 @@
 document.getElementsByTagName('form').item(0).addEventListener('submit', sendRequest());
 
+loading = false
 hideLoading();
 
 function sendRequest() {
     return async function (e) {
         e.preventDefault();
         let links = document.getElementById('link').value.trim().split(" ");
-        if (links.length > 0 && links[0] !== '') {
+        if (links.length > 0 && links[0] !== '' && !loading) {
             showLoading();
             // development:
             // let urlString = "http://localhost:8080/api?";
@@ -51,11 +52,12 @@ function sendRequest() {
                 }
 
                 result = ConvertToCSV(arr);
+                fileName = links.join().replace(/\//gm, "_") + ".csv";
                 let fileToSave = new Blob([result], {
                     type: "csv",
-                    name: links[0].replace(/\//gm, "_") + ".csv"
+                    name: fileName
                 });
-                saveAs(fileToSave, links[0].replace(/\//gm, ":") + ".csv");
+                saveAs(fileToSave, fileName);
             } else {
                 movie.innerHTML = `<p id="missingMovie">Sorry that list does not exist.</p>`;
             }
@@ -64,10 +66,12 @@ function sendRequest() {
 }
 
 function showLoading() {
+    loading = true
     document.getElementById('submitButton').innerHTML = '<span id="spinner" class="spinner-border text-light spinner-border-sm" role="status" aria-hidden="true"></span>Loading...';
 }
 
 function hideLoading() {
+    loading = false
     document.getElementById('submitButton').innerHTML = 'SUBMIT';
 }
 
