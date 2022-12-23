@@ -2,10 +2,11 @@ package fetchlist
 
 import (
 	"fmt"
-	"strings"
 	"log"
+	"strings"
 
 	"github.com/gocolly/colly"
+	"github.com/gocolly/colly/extensions"
 )
 
 type Movie struct {
@@ -20,11 +21,15 @@ func FetchWatchlist(link string) []Movie {
 		colly.Async(true),
 	)
 
+	// Determines if a link to a list or a username.
+	link = formatInput(link)
+
 	err := c.Limit(&colly.LimitRule{DomainGlob: "*", Parallelism: 4})
 	if err != nil {
-		log.Println("Failed to setup colly limit ", err)
+		log.Fatal("Failed to setup colly limit ", err)
 	}
 
+	extensions.RandomUserAgent(c)
 	c.OnRequest(func(r *colly.Request) {
 		fmt.Println("Visiting: ", r.URL.String())
 	})
@@ -50,9 +55,17 @@ func FetchWatchlist(link string) []Movie {
 
 	err = c.Visit(link)
 	if err != nil {
-		log.Println("Failed to visit webpage", err)
+		log.Fatal("Failed to visit webpage ", err)
 	}
 
 	c.Wait()
 	return movies
+}
+
+func formatInput(s string) string {
+	if strings.HasPrefix(s, "http") {
+		return s
+	}
+
+	return fmt.Sprintf("https://letterboxd.com/%s/watchlist/page/1/", s)
 }
