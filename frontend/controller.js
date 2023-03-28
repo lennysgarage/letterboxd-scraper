@@ -1,6 +1,6 @@
 document.getElementsByTagName('form').item(0).addEventListener('submit', sendRequest());
 
-loading = false
+loading = false;
 hideLoading();
 
 function sendRequest() {
@@ -66,12 +66,12 @@ function sendRequest() {
 }
 
 function showLoading() {
-    loading = true
+    loading = true;
     document.getElementById('submitButton').innerHTML = '<span id="spinner" class="spinner-border text-light spinner-border-sm" role="status" aria-hidden="true"></span>Loading...';
 }
 
 function hideLoading() {
-    loading = false
+    loading = false;
     document.getElementById('submitButton').innerHTML = 'SUBMIT';
 }
 
