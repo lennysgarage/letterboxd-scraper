@@ -21,25 +21,23 @@ func FetchWatchlist(link string) []Movie {
 		colly.Async(true),
 	)
 
+	c.OnError(func(e *colly.Response, err error) {
+		fmt.Println("Something went wrong: ", err)
+	})
+
 	// Determines if a link to a list or a username.
 	link = formatInput(link)
 
-	err := c.Limit(&colly.LimitRule{DomainGlob: "*", Parallelism: 4})
-	if err != nil {
-		log.Fatal("Failed to setup colly limit ", err)
-	}
+	c.Limit(&colly.LimitRule{DomainGlob: "*", Parallelism: 4})
 
 	extensions.RandomUserAgent(c)
 	c.OnRequest(func(r *colly.Request) {
-		fmt.Println("Visiting: ", r.URL.String())
+		log.Println("Visiting: ", r.URL.String())
 	})
 
 	c.OnHTML(".pagination", func(e *colly.HTMLElement) {
 		nextPage := e.ChildAttr(".paginate-nextprev a.next", "href")
-		err = c.Visit(e.Request.AbsoluteURL(nextPage))
-		if err != nil {
-			log.Println("Failed to visit absoluteURL", err)
-		}
+		c.Visit(e.Request.AbsoluteURL(nextPage))
 	})
 
 	// Find all movies in list
@@ -53,10 +51,7 @@ func FetchWatchlist(link string) []Movie {
 		movies = append(movies, movie)
 	})
 
-	err = c.Visit(link)
-	if err != nil {
-		log.Fatal("Failed to visit webpage ", err)
-	}
+	c.Visit(link)
 
 	c.Wait()
 	return movies
