@@ -14,7 +14,7 @@ import (
 func writeList(link string, movies []fetchlist.Movie) error {
 	link = strings.Replace(link, "https://letterboxd.com/", "", 1) // remove url in name of file
 
-	file, err := os.Create(fmt.Sprintf("%s.csv", strings.Replace(link, "/", ":", -1)))
+	file, err := os.Create(fmt.Sprintf("%s.csv", strings.Trim(strings.Replace(link, "/", "-", -1), "-")))
 	if err != nil {
 		return err
 	}
