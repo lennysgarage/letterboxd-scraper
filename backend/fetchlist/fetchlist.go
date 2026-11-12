@@ -41,8 +41,10 @@ func FetchWatchlist(link string) []Movie {
 	})
 
 	// Find all movies in list
-	c.OnHTML(".poster-list li", func(e *colly.HTMLElement) {
-		film := e.ChildAttr("div", "data-target-link")
+	// (letterboxd renders list items as div.react-component with
+	// data-target-link; the old .poster-list li markup is gone)
+	c.OnHTML("div[data-target-link]", func(e *colly.HTMLElement) {
+		film := e.Attr("data-target-link")
 
 		movie := Movie{}
 		movie.Title = strings.Replace(film[6:len(film)-1], "-", " ", -1)
