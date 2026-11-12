@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/gocolly/colly"
 	"github.com/gocolly/colly/extensions"
@@ -28,7 +29,9 @@ func FetchWatchlist(link string) []Movie {
 	// Determines if a link to a list or a username.
 	link = formatInput(link)
 
-	c.Limit(&colly.LimitRule{DomainGlob: "*", Parallelism: 4})
+	// letterboxd burst-blocks IPs that request pages too fast (HTTP 403);
+	// pace the pagination chain politely
+	c.Limit(&colly.LimitRule{DomainGlob: "*", Parallelism: 4, Delay: 700 * time.Millisecond, RandomDelay: 300 * time.Millisecond})
 
 	extensions.RandomUserAgent(c)
 	c.OnRequest(func(r *colly.Request) {
@@ -61,16 +64,6 @@ func FetchWatchlist(link string) []Movie {
 
 func formatInput(s string) string {
 	if strings.HasPrefix(s, "http") {
-		// letterboxd returns HTTP 403 for deep pagination of profile
-		// /films/ pages; this tool picks from watchlists, so map any
-		// film-history link to that user's watchlist instead
-		if i := strings.Index(s, "/films/"); i != -1 {
-			parts := strings.Split(s[:i], "/")
-			user := parts[len(parts)-1]
-			if user != "" {
-				return fmt.Sprintf("https://letterboxd.com/%s/watchlist/page/1/", user)
-			}
-		}
 		return s
 	}
 
