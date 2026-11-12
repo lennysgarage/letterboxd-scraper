@@ -12,7 +12,7 @@ function sendRequest() {
             // development:
             // let urlString = "http://localhost:8080/api?";
             // production:
-            let urlString = "https://letterboxd-scraper.herokuapp.com/api?";
+            let urlString = "https://scraper.lennysgarage.com/api?";
 
             links.forEach((link) => {
                 urlString += "src=" + link + "&";
